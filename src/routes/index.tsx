@@ -49,12 +49,16 @@ function Index() {
   const [name, setName] = useState("");
   const storiesRef = useRef<HTMLElement>(null);
 
-  const startQuiz = () => { setAnswers([]); setQuizStep(0); };
+  const startQuiz = () => { setSelectedStory(null); setAnswers([]); setQuizStep(0); };
   const pickAnswer = (answer: number) => {
     setAnswers((previous) => [...previous.slice(0, quizStep ?? 0), answer]);
     setQuizStep((previous) => previous === null ? 0 : previous + 1);
   };
   const recommendation = answers[0] === 1 ? 2 : answers[0] === 2 ? 0 : 1;
+  const activeAnswer = activeConcern !== null ? concerns[activeConcern]?.answer : null;
+  const story = selectedStory !== null ? mentors[selectedStory] : undefined;
+  const currentQuestion = quizStep !== null ? quiz[quizStep] : undefined;
+  const suggestedMentor = mentors[recommendation] ?? mentors[0];
   const closeOverlay = () => { setSelectedStory(null); setQuizStep(null); setShowProfile(false); };
 
   return (
@@ -96,7 +100,7 @@ function Index() {
                   </Button>;
                 })}
               </div>
-              {activeConcern !== null && <div className="mt-3 rounded-2xl bg-card/80 px-4 py-3 text-[13px] leading-relaxed text-foreground" role="status">{concerns[activeConcern].answer}</div>}
+              {activeAnswer && <div className="mt-3 rounded-2xl bg-card/80 px-4 py-3 text-[13px] leading-relaxed text-foreground" role="status">{activeAnswer}</div>}
             </div>
           </section>
         </div>
@@ -128,7 +132,7 @@ function Index() {
           </div>
         </section>
 
-        <nav className="absolute inset-x-0 bottom-0 z-20 grid h-[77px] grid-cols-4 border-t border-border/70 bg-background/95 px-3 pb-2 backdrop-blur-md" aria-label="Main navigation">
+        <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto grid h-[77px] w-full max-w-[460px] grid-cols-4 border-t border-border/70 bg-background/95 px-3 pb-2 backdrop-blur-md sm:absolute" aria-label="Main navigation">
           <Button variant="nav" data-active="true" className="h-full text-[10px] font-bold" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}><Home className="size-5 fill-current" />Home</Button>
           <Button variant="nav" className="h-full text-[10px] font-bold" onClick={() => storiesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}><Heart className="size-5" />Stories</Button>
           <Button variant="nav" className="h-full text-[10px] font-bold" onClick={startQuiz}><Sparkles className="size-5" />Match</Button>
@@ -137,11 +141,11 @@ function Index() {
       </main>
 
       {(selectedStory !== null || quizStep !== null || showProfile) && <div className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/35 p-0 sm:items-center sm:p-5" onMouseDown={(event) => { if (event.target === event.currentTarget) closeOverlay(); }}>
-        <div role="dialog" aria-modal="true" aria-label={selectedStory !== null ? `${mentors[selectedStory].name}'s story` : quizStep !== null ? "Find your TechBestie" : "Your profile"} className="w-full max-w-[420px] rounded-t-[28px] bg-background px-6 pb-9 pt-5 shadow-2xl sm:rounded-[28px]">
+        <div role="dialog" aria-modal="true" aria-label={story ? `${story.name}'s story` : quizStep !== null ? "Find your TechBestie" : "Your profile"} className="w-full max-w-[420px] rounded-t-[28px] bg-background px-6 pb-9 pt-5 shadow-2xl sm:rounded-[28px]">
           <div className="mb-5 flex items-center justify-between"><span className="text-[11px] font-extrabold uppercase text-primary">TECH<span className="font-script text-lg normal-case">Bestie</span></span><Button variant="ghost" size="icon" aria-label="Close" className="rounded-full" onClick={closeOverlay}><X /></Button></div>
-          {selectedStory !== null && <div><div className="avatar-ring inline-block rounded-full p-[3px]"><img src={mentors[selectedStory].image} width={816} height={816} alt={mentors[selectedStory].name} className="size-20 rounded-full border-[3px] border-card object-cover" /></div><h2 className="mt-3 text-2xl font-extrabold">Meet {mentors[selectedStory].name}</h2><p className="mt-1 text-sm text-muted-foreground">{mentors[selectedStory].school}</p><p className="mt-5 text-lg font-bold leading-snug">“{mentors[selectedStory].quote}”</p><p className="mt-4 text-sm leading-relaxed text-ink-soft">{mentors[selectedStory].story}</p><Button variant="glow" className="mt-7 h-12 w-full font-bold" onClick={startQuiz}>Find someone like {mentors[selectedStory].name}<ArrowRight /></Button></div>}
-          {quizStep !== null && quizStep < quiz.length && <div><div className="mb-4 flex items-center justify-between"><span className="text-xs font-bold text-primary">QUESTION {quizStep + 1} OF 3</span><div className="flex gap-1">{quiz.map((_, index) => <span key={index} className={`h-1.5 w-6 rounded-full ${index <= quizStep ? "bg-primary" : "bg-secondary"}`} />)}</div></div><h2 className="mb-6 text-[26px] font-extrabold leading-tight">{quiz[quizStep].title}</h2><div className="space-y-3">{quiz[quizStep].choices.map((choice, index) => <Button key={choice} variant="choice" className="h-14 w-full px-4 text-left text-sm font-bold" onClick={() => pickAnswer(index)}>{choice}<ArrowRight className="size-4 text-primary" /></Button>)}</div>{quizStep > 0 && <Button variant="plain" className="mt-6 p-0 text-xs" onClick={() => setQuizStep(quizStep - 1)}><ArrowLeft className="size-4" /> Back</Button>}</div>}
-          {quizStep !== null && quizStep >= quiz.length && <div><div className="mb-3 grid size-12 place-items-center rounded-full bg-secondary text-primary"><Check /></div><h2 className="text-[26px] font-extrabold">Meet your TechBestie</h2><p className="mt-2 text-sm leading-relaxed text-ink-soft">Based on your answers, you might connect with {mentors[recommendation].name}.</p><div className="mt-6 flex items-center gap-4 rounded-2xl bg-secondary p-4"><img src={mentors[recommendation].image} width={816} height={816} alt={mentors[recommendation].name} className="size-16 rounded-full object-cover" /><div><div className="font-extrabold">{mentors[recommendation].name}</div><div className="text-xs text-muted-foreground">{mentors[recommendation].school}</div></div></div><Button variant="glow" className="mt-6 h-12 w-full font-bold" onClick={() => { setQuizStep(null); setSelectedStory(recommendation); }}>Read her story <ArrowRight /></Button><p className="mt-3 text-center text-xs text-muted-foreground">A real introduction isn't available yet.</p></div>}
+          {story && <div><div className="avatar-ring inline-block rounded-full p-[3px]"><img src={story.image} width={816} height={816} alt={story.name} className="size-20 rounded-full border-[3px] border-card object-cover" /></div><h2 className="mt-3 text-2xl font-extrabold">Meet {story.name}</h2><p className="mt-1 text-sm text-muted-foreground">{story.school}</p><p className="mt-5 text-lg font-bold leading-snug">“{story.quote}”</p><p className="mt-4 text-sm leading-relaxed text-ink-soft">{story.story}</p><Button variant="glow" className="mt-7 h-12 w-full font-bold" onClick={startQuiz}>Find someone like {story.name}<ArrowRight /></Button></div>}
+          {quizStep !== null && currentQuestion && <div><div className="mb-4 flex items-center justify-between"><span className="text-xs font-bold text-primary">QUESTION {quizStep + 1} OF 3</span><div className="flex gap-1">{quiz.map((_, index) => <span key={index} className={`h-1.5 w-6 rounded-full ${index <= quizStep ? "bg-primary" : "bg-secondary"}`} />)}</div></div><h2 className="mb-6 text-[26px] font-extrabold leading-tight">{currentQuestion.title}</h2><div className="space-y-3">{currentQuestion.choices.map((choice, index) => <Button key={choice} variant="choice" className="h-14 w-full px-4 text-left text-sm font-bold" onClick={() => pickAnswer(index)}>{choice}<ArrowRight className="size-4 text-primary" /></Button>)}</div>{quizStep > 0 && <Button variant="plain" className="mt-6 p-0 text-xs" onClick={() => setQuizStep(quizStep - 1)}><ArrowLeft className="size-4" /> Back</Button>}</div>}
+          {quizStep !== null && quizStep >= quiz.length && suggestedMentor && <div><div className="mb-3 grid size-12 place-items-center rounded-full bg-secondary text-primary"><Check /></div><h2 className="text-[26px] font-extrabold">Meet your TechBestie</h2><p className="mt-2 text-sm leading-relaxed text-ink-soft">Based on your answers, you might connect with {suggestedMentor.name}.</p><div className="mt-6 flex items-center gap-4 rounded-2xl bg-secondary p-4"><img src={suggestedMentor.image} width={816} height={816} alt={suggestedMentor.name} className="size-16 rounded-full object-cover" /><div><div className="font-extrabold">{suggestedMentor.name}</div><div className="text-xs text-muted-foreground">{suggestedMentor.school}</div></div></div><Button variant="glow" className="mt-6 h-12 w-full font-bold" onClick={() => { setQuizStep(null); setSelectedStory(recommendation); }}>Read her story <ArrowRight /></Button><p className="mt-3 text-center text-xs text-muted-foreground">A real introduction isn't available yet.</p></div>}
           {showProfile && <div><div className="mb-4 grid size-14 place-items-center rounded-full bg-secondary text-primary"><UserRound className="size-7" /></div><h2 className="text-2xl font-extrabold">Make it yours</h2><p className="mt-2 text-sm text-ink-soft">What should we call you?</p><label htmlFor="name" className="mt-5 block text-xs font-bold">Your first name</label><input id="name" type="text" maxLength={24} value={name} onChange={(event) => setName(event.target.value)} placeholder="Your name" className="mt-2 h-12 w-full rounded-xl border border-input bg-background px-4 text-sm outline-none focus:ring-2 focus:ring-ring" /><Button variant="glow" className="mt-5 h-12 w-full font-bold" onClick={() => setShowProfile(false)}>Save name <Check /></Button></div>}
         </div>
       </div>}
