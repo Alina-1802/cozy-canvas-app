@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the TechBestie home experience and its lightweight, non-persistent demo interactions in the index route; this avoids implying a real matching service without a connected backend.
+- Keep the TechBestie welcome, survey, home, story and chat demo views in the index route with ephemeral state; this makes the clickable prototype honest about having no connected messaging or matching service.
