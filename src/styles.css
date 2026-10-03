@@ -118,4 +118,10 @@
 .dark .hero-panel::before { background: radial-gradient(circle at 86% 13%, oklch(0.85 0.1 315 / 15%), transparent 40%); }
 .dark .cta-gradient { background: linear-gradient(105deg, oklch(0.48 0.14 289), oklch(0.53 0.16 325), oklch(0.59 0.14 12)); }
 .dark .app-shell, .dark .story-card, .dark .choice-tile { box-shadow: none; }
+.intro-scene { background: linear-gradient(160deg, var(--color-background) 0%, var(--color-secondary) 46%, var(--color-blush) 78%, var(--color-background) 100%); }
+.intro-halo { box-shadow: 0 0 90px 38px var(--color-blush); }
+.intro-reveal { animation: intro-reveal .7s ease-out both; }
+.intro-people { animation: intro-people .9s .15s ease-out both; }
+@keyframes intro-reveal { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes intro-people { from { opacity: 0; transform: translateY(24px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
