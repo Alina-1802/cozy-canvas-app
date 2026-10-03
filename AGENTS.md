@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the TechBestie home experience and its lightweight, non-persistent demo interactions in the index route; this avoids implying a real matching service without a connected backend.

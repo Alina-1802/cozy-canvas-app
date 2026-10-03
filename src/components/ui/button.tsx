@@ -16,6 +16,10 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        choice: "choice-tile justify-between whitespace-normal rounded-2xl bg-card text-foreground hover:bg-card focus-visible:ring-2 focus-visible:ring-ring",
+        glow: "cta-gradient rounded-2xl text-primary-foreground shadow-lg hover:brightness-105 focus-visible:ring-2 focus-visible:ring-ring",
+        plain: "bg-transparent text-primary hover:text-foreground",
+        nav: "flex-col gap-1 rounded-none bg-transparent text-muted-foreground hover:text-primary data-[active=true]:text-primary",
       },
       size: {
         default: "h-9 px-4 py-2",
